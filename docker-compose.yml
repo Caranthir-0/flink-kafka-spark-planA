@@ -19,7 +19,7 @@ services:
       retries: 10
 
   kafka:
-    image: bitnami/kafka:3.7
+    image: docker.io/apache/kafka:3.7.0
     container_name: kafka
     ports:
       - "9092:9092"
@@ -72,10 +72,9 @@ services:
       - jobmanager
 
   spark-master:
-    image: bitnami/spark:3.5
+    image: docker.io/apache/spark:3.5.1
     container_name: spark-master
-    environment:
-      - SPARK_MODE=master
+    command: bin/spark-class org.apache.spark.deploy.master.Master
     ports:
       - "7077:7077"
       - "8080:8080"
@@ -87,11 +86,10 @@ services:
         condition: service_healthy
 
   spark-worker:
-    image: bitnami/spark:3.5
+    image: docker.io/apache/spark:3.5.1
     container_name: spark-worker
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
     environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_MEMORY=2G
       - SPARK_WORKER_CORES=2
     depends_on:
